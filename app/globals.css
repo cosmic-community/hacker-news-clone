@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-300;
+  }
+  
+  body {
+    @apply bg-hn-beige text-gray-900 font-sans;
+  }
+  
+  a {
+    @apply text-gray-900 no-underline;
+  }
+  
+  a:hover {
+    @apply underline;
+  }
+}
+
+@layer components {
+  .hn-link {
+    @apply text-gray-900 no-underline hover:underline;
+  }
+  
+  .hn-subtext {
+    @apply text-sm text-hn-gray;
+  }
+  
+  .hn-button {
+    @apply px-3 py-1 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors;
+  }
+}
