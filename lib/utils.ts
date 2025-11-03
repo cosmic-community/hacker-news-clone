@@ -15,14 +15,27 @@ export function buildCommentTree(comments: Comment[]): NestedComment[] {
     const nestedComment = commentMap.get(comment.id);
     if (!nestedComment) return;
 
-    const parentId = comment.metadata?.parent_comment?.id;
+    // Check if parent_comment exists and is a string (ID) or object
+    const parentComment = comment.metadata?.parent_comment;
+    let parentId: string | undefined;
+    
+    if (typeof parentComment === 'string') {
+      parentId = parentComment;
+    } else if (parentComment && typeof parentComment === 'object' && 'id' in parentComment) {
+      parentId = parentComment.id;
+    }
     
     if (parentId) {
+      // Only nest under parent if parent exists in our comment set
       const parent = commentMap.get(parentId);
       if (parent && parent.replies) {
         parent.replies.push(nestedComment);
+      } else {
+        // Parent not in our set (might be on different story), treat as root
+        rootComments.push(nestedComment);
       }
     } else {
+      // No parent, this is a root comment
       rootComments.push(nestedComment);
     }
   });

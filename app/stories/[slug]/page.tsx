@@ -18,20 +18,18 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
   }
 
   // Fetch comments using the story ID
-  console.log('Fetching comments for story:', story.title);
-  console.log('Story ID:', story.id);
-  console.log('Story metadata:', JSON.stringify(story.metadata, null, 2));
-  
   const comments = await getStoryComments(story.id)
   
   console.log('Comments fetched:', comments.length);
   if (comments.length > 0) {
-    console.log('First comment:', JSON.stringify(comments[0], null, 2));
+    console.log('First comment parent_comment type:', typeof comments[0].metadata?.parent_comment);
+    console.log('First comment parent_comment value:', comments[0].metadata?.parent_comment);
   }
   
   const commentTree = buildCommentTree(comments as Comment[])
   
   console.log('Comment tree built:', commentTree.length);
+  console.log('Root comments:', commentTree.map(c => ({ id: c.id, author: c.metadata?.author })));
 
   return (
     <div className="space-y-6">
