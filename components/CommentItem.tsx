@@ -5,14 +5,18 @@ import { NestedComment } from '@/types'
 import { timeAgo } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
 import CommentTree from '@/components/CommentTree'
+import CommentForm from '@/components/CommentForm'
 
 interface CommentItemProps {
   comment: NestedComment
   depth: number
+  storyId: string
+  isLoggedIn: boolean
 }
 
-export default function CommentItem({ comment, depth }: CommentItemProps) {
+export default function CommentItem({ comment, depth, storyId, isLoggedIn }: CommentItemProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isReplying, setIsReplying] = useState(false)
   const hasReplies = comment.replies && comment.replies.length > 0
   const indent = depth * 40
 
@@ -47,15 +51,37 @@ export default function CommentItem({ comment, depth }: CommentItemProps) {
           
           {!isCollapsed && (
             <>
-              <div className="prose prose-sm max-w-none text-gray-900">
+              <div className="prose prose-sm max-w-none text-gray-900 mb-2">
                 <ReactMarkdown>{content}</ReactMarkdown>
               </div>
+              
+              {isLoggedIn && !isReplying && (
+                <button
+                  onClick={() => setIsReplying(true)}
+                  className="text-xs text-hn-gray hover:underline mb-2"
+                >
+                  reply
+                </button>
+              )}
+              
+              {isReplying && (
+                <div className="mb-4">
+                  <CommentForm
+                    storyId={storyId}
+                    parentCommentId={comment.id}
+                    onCancel={() => setIsReplying(false)}
+                    placeholder="Write your reply..."
+                  />
+                </div>
+              )}
               
               {hasReplies && (
                 <div className="mt-4">
                   <CommentTree 
                     comments={comment.replies!} 
                     depth={depth + 1}
+                    storyId={storyId}
+                    isLoggedIn={isLoggedIn}
                   />
                 </div>
               )}

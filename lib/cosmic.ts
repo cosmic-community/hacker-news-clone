@@ -1,5 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
-import { User } from '@/types'
+import { User, Comment } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -90,6 +90,45 @@ export async function getStoryComments(storyId: string) {
       return [];
     }
     throw new Error('Failed to fetch comments');
+  }
+}
+
+// Create a new comment
+export async function createComment(
+  storyId: string,
+  author: string,
+  content: string,
+  parentCommentId?: string
+): Promise<Comment> {
+  try {
+    const metadata: {
+      content: string;
+      author: string;
+      story: string;
+      parent_comment?: string;
+      points: number;
+    } = {
+      content,
+      author,
+      story: storyId,
+      points: 0
+    };
+
+    // Add parent_comment if this is a reply
+    if (parentCommentId) {
+      metadata.parent_comment = parentCommentId;
+    }
+
+    const response = await cosmic.objects.insertOne({
+      title: `Comment by ${author}`,
+      type: 'comments',
+      metadata
+    });
+    
+    return response.object as Comment;
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    throw new Error('Failed to create comment');
   }
 }
 
