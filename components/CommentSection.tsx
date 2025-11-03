@@ -16,26 +16,32 @@ export default function CommentSection({ storyId, initialComments, isLoggedIn }:
   const [comments, setComments] = useState<NestedComment[]>(initialComments)
 
   const handleCommentAdded = (newComment: any) => {
-    // Create optimistic comment object
-    const optimisticComment: NestedComment = {
-      id: newComment.id,
-      title: newComment.title,
-      slug: newComment.slug,
-      type: 'comments', // Changed: Added required type property
-      created_at: newComment.created_at,
-      modified_at: newComment.modified_at || newComment.created_at, // Changed: Added required modified_at property
-      metadata: {
-        author: newComment.metadata?.author || 'unknown',
-        content: newComment.metadata?.content || '',
-        points: newComment.metadata?.points || 0,
-        story: newComment.metadata?.story,
-        parent_comment: newComment.metadata?.parent_comment
-      },
-      replies: []
+    // Only add to top-level if it's a root comment (no parent)
+    // Changed: Check if parent_comment exists to determine if this is a reply
+    if (!newComment.metadata?.parent_comment) {
+      // Create optimistic comment object for root comments only
+      const optimisticComment: NestedComment = {
+        id: newComment.id,
+        title: newComment.title,
+        slug: newComment.slug,
+        type: 'comments',
+        created_at: newComment.created_at,
+        modified_at: newComment.modified_at || newComment.created_at,
+        metadata: {
+          author: newComment.metadata?.author || 'unknown',
+          content: newComment.metadata?.content || '',
+          points: newComment.metadata?.points || 0,
+          story: newComment.metadata?.story,
+          parent_comment: newComment.metadata?.parent_comment
+        },
+        replies: []
+      }
+      
+      // Add to top-level comments
+      setComments(prev => [optimisticComment, ...prev])
     }
-    
-    // Add to top-level comments
-    setComments(prev => [optimisticComment, ...prev])
+    // Changed: If it has a parent_comment, don't add to top-level
+    // The nested comment will be handled by CommentItem's optimisticReplies
   }
 
   return (
