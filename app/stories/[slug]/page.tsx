@@ -3,8 +3,9 @@ import { getStory, getStoryComments } from '@/lib/cosmic'
 import { Story, Comment } from '@/types'
 import { notFound } from 'next/navigation'
 import StoryDetail from '@/components/StoryDetail'
-import CommentTree from '@/components/CommentTree'
+import CommentSection from '@/components/CommentSection'
 import { buildCommentTree } from '@/lib/utils'
+import { getSession } from '@/lib/auth'
 
 export const revalidate = 60
 
@@ -31,24 +32,18 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
   console.log('Comment tree built:', commentTree.length);
   console.log('Root comments:', commentTree.map(c => ({ id: c.id, author: c.metadata?.author })));
 
+  // Check if user is logged in
+  const session = await getSession()
+
   return (
     <div className="space-y-6">
       <StoryDetail story={story as Story} />
       
-      {commentTree.length > 0 && (
-        <div className="bg-white border border-gray-300 rounded p-4">
-          <h2 className="text-lg font-bold mb-4">
-            {commentTree.length} comment{commentTree.length === 1 ? '' : 's'}
-          </h2>
-          <CommentTree comments={commentTree} />
-        </div>
-      )}
-      
-      {commentTree.length === 0 && (
-        <div className="bg-white border border-gray-300 rounded p-4 text-center text-hn-gray">
-          No comments yet. Be the first to comment!
-        </div>
-      )}
+      <CommentSection 
+        storyId={story.id}
+        initialComments={commentTree}
+        isLoggedIn={!!session}
+      />
     </div>
   )
 }
