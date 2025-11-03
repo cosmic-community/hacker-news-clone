@@ -75,7 +75,11 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
           <h2 className="text-lg font-bold mb-4">
             {commentTree.length} comment{commentTree.length === 1 ? '' : 's'}
           </h2>
-          <CommentTree comments={commentTree} />
+          <CommentTree 
+            comments={commentTree} 
+            storyId={story.id}
+            isLoggedIn={!!session}
+          />
         </div>
       )}
       
