@@ -50,6 +50,26 @@ export async function getStoriesByType(storyType: string) {
   }
 }
 
+// Fetch stories by author
+export async function getStoriesByAuthor(author: string) {
+  try {
+    const response = await cosmic.objects
+      .find({ 
+        type: 'stories',
+        'metadata.author': author
+      })
+      .props(['id', 'title', 'slug', 'metadata', 'created_at'])
+      .depth(1);
+    
+    return response.objects;
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return [];
+    }
+    throw new Error('Failed to fetch stories by author');
+  }
+}
+
 // Fetch a single story
 export async function getStory(slug: string) {
   try {

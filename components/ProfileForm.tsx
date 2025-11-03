@@ -7,9 +7,10 @@ interface ProfileFormProps {
   initialName: string
   initialEmail: string
   createdAt: string
+  submissionCount: number
 }
 
-export default function ProfileForm({ initialName, initialEmail, createdAt }: ProfileFormProps) {
+export default function ProfileForm({ initialName, initialEmail, createdAt, submissionCount }: ProfileFormProps) {
   const router = useRouter()
   const [name, setName] = useState(initialName)
   const [email, setEmail] = useState(initialEmail)
@@ -73,9 +74,12 @@ export default function ProfileForm({ initialName, initialEmail, createdAt }: Pr
         </div>
       )}
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
         <p className="text-sm text-gray-600">
           Member since: {new Date(createdAt).toLocaleDateString()}
+        </p>
+        <p className="text-sm text-gray-600">
+          Total submissions: {submissionCount}
         </p>
       </div>
 
