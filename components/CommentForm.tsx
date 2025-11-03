@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 interface CommentFormProps {
   storyId: string
   parentCommentId?: string
-  onSuccess?: () => void
+  onSuccess?: (comment: any) => void
 }
 
 export default function CommentForm({ storyId, parentCommentId, onSuccess }: CommentFormProps) {
@@ -44,10 +44,12 @@ export default function CommentForm({ storyId, parentCommentId, onSuccess }: Com
         throw new Error(data.error || 'Failed to post comment')
       }
 
+      const data = await response.json()
       setContent('')
       
       if (onSuccess) {
-        onSuccess()
+        // Pass the created comment back to parent
+        onSuccess(data.comment)
       } else {
         // Refresh the page to show the new comment
         router.refresh()

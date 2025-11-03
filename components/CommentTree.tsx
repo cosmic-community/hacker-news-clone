@@ -6,9 +6,10 @@ interface CommentTreeProps {
   depth?: number
   storyId: string
   isLoggedIn: boolean
+  onCommentAdded?: (comment: any) => void
 }
 
-export default function CommentTree({ comments, depth = 0, storyId, isLoggedIn }: CommentTreeProps) {
+export default function CommentTree({ comments, depth = 0, storyId, isLoggedIn, onCommentAdded }: CommentTreeProps) {
   if (!comments || comments.length === 0) {
     return null
   }
@@ -22,6 +23,7 @@ export default function CommentTree({ comments, depth = 0, storyId, isLoggedIn }
           depth={depth}
           storyId={storyId}
           isLoggedIn={isLoggedIn}
+          onCommentAdded={onCommentAdded}
         />
       ))}
     </div>

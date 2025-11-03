@@ -12,12 +12,14 @@ interface CommentItemProps {
   depth: number
   storyId: string
   isLoggedIn: boolean
+  onCommentAdded?: (comment: any) => void
 }
 
-export default function CommentItem({ comment, depth, storyId, isLoggedIn }: CommentItemProps) {
+export default function CommentItem({ comment, depth, storyId, isLoggedIn, onCommentAdded }: CommentItemProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [showReplyForm, setShowReplyForm] = useState(false)
-  const hasReplies = comment.replies && comment.replies.length > 0
+  const [optimisticReplies, setOptimisticReplies] = useState<NestedComment[]>([])
+  const hasReplies = (comment.replies && comment.replies.length > 0) || optimisticReplies.length > 0
   const indent = depth * 40
 
   // Safely access comment metadata
@@ -25,10 +27,35 @@ export default function CommentItem({ comment, depth, storyId, isLoggedIn }: Com
   const content = comment.metadata?.content || ''
   const points = comment.metadata?.points || 0
 
-  const handleReplySuccess = () => {
+  const handleReplySuccess = (newComment: any) => {
     setShowReplyForm(false)
-    // The page will refresh automatically to show the new reply
+    
+    // Add the new comment optimistically to the UI
+    const optimisticComment: NestedComment = {
+      id: newComment.id,
+      title: newComment.title,
+      slug: newComment.slug,
+      created_at: newComment.created_at,
+      metadata: {
+        author: newComment.metadata?.author || 'unknown',
+        content: newComment.metadata?.content || '',
+        points: newComment.metadata?.points || 0,
+        story: newComment.metadata?.story,
+        parent_comment: newComment.metadata?.parent_comment
+      },
+      replies: []
+    }
+    
+    setOptimisticReplies(prev => [...prev, optimisticComment])
+    
+    // Notify parent component
+    if (onCommentAdded) {
+      onCommentAdded(newComment)
+    }
   }
+
+  // Combine actual replies with optimistic replies
+  const allReplies = [...(comment.replies || []), ...optimisticReplies]
 
   return (
     <div style={{ marginLeft: `${indent}px` }} className="space-y-2">
@@ -90,10 +117,11 @@ export default function CommentItem({ comment, depth, storyId, isLoggedIn }: Com
               {hasReplies && (
                 <div className="mt-4">
                   <CommentTree 
-                    comments={comment.replies!} 
+                    comments={allReplies} 
                     depth={depth + 1}
                     storyId={storyId}
                     isLoggedIn={isLoggedIn}
+                    onCommentAdded={onCommentAdded}
                   />
                 </div>
               )}
