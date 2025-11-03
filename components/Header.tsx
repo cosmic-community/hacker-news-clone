@@ -10,7 +10,9 @@ export default async function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 hover:no-underline">
-              <div className="w-5 h-5 bg-white border border-white" />
+              <div className="w-5 h-5 bg-white border border-white flex items-center justify-center">
+                <span className="text-hn-orange font-bold text-xs leading-none" style={{ fontFamily: 'monospace' }}>Y</span>
+              </div>
               <span className="text-white font-bold text-sm">Hacker News</span>
             </Link>
             
