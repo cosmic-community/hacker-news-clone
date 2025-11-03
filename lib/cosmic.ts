@@ -66,9 +66,10 @@ export async function getStory(slug: string) {
   }
 }
 
-// Fetch comments for a story
+// Fetch comments for a story - improved to handle object relationships properly
 export async function getStoryComments(storyId: string) {
   try {
+    // Query by the story object ID in the metadata.story field
     const response = await cosmic.objects
       .find({ 
         type: 'comments',
@@ -77,8 +78,10 @@ export async function getStoryComments(storyId: string) {
       .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(2);
     
+    console.log('Fetched comments for story:', storyId, 'Count:', response.objects.length);
     return response.objects;
   } catch (error) {
+    console.error('Error fetching comments:', error);
     if (hasStatus(error) && error.status === 404) {
       return [];
     }

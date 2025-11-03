@@ -1,3 +1,4 @@
+// app/stories/[slug]/page.tsx
 import { getStory, getStoryComments } from '@/lib/cosmic'
 import { Story, Comment } from '@/types'
 import { notFound } from 'next/navigation'
@@ -16,8 +17,15 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
     notFound()
   }
 
+  // Fetch comments using the story ID
   const comments = await getStoryComments(story.id)
+  
+  console.log('Story:', story.title, 'ID:', story.id);
+  console.log('Comments fetched:', comments.length);
+  
   const commentTree = buildCommentTree(comments as Comment[])
+  
+  console.log('Comment tree built:', commentTree.length);
 
   return (
     <div className="space-y-6">
@@ -34,7 +42,7 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
       
       {commentTree.length === 0 && (
         <div className="bg-white border border-gray-300 rounded p-4 text-center text-hn-gray">
-          No comments yet
+          No comments yet. Be the first to comment!
         </div>
       )}
     </div>
