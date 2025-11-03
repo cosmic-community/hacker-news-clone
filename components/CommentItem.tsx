@@ -16,29 +16,39 @@ export default function CommentItem({ comment, depth }: CommentItemProps) {
   const hasReplies = comment.replies && comment.replies.length > 0
   const indent = depth * 40
 
+  // Safely access comment metadata
+  const author = comment.metadata?.author || 'unknown'
+  const content = comment.metadata?.content || ''
+  const points = comment.metadata?.points || 0
+
   return (
     <div style={{ marginLeft: `${indent}px` }} className="space-y-2">
       <div className="flex items-start gap-2">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="text-hn-gray hover:text-gray-900 flex-shrink-0 w-3 text-xs"
+          aria-label={isCollapsed ? 'Expand comment' : 'Collapse comment'}
         >
           {isCollapsed ? '[+]' : '[-]'}
         </button>
         
         <div className="flex-1 min-w-0">
           <div className="hn-subtext flex items-center gap-2 mb-2">
-            <span className="font-bold">{comment.metadata?.author || 'unknown'}</span>
+            <span className="font-bold">{author}</span>
             <span>•</span>
             <span>{timeAgo(comment.created_at)}</span>
-            <span>•</span>
-            <span>{comment.metadata?.points || 0} points</span>
+            {points > 0 && (
+              <>
+                <span>•</span>
+                <span>{points} points</span>
+              </>
+            )}
           </div>
           
           {!isCollapsed && (
             <>
               <div className="prose prose-sm max-w-none text-gray-900">
-                <ReactMarkdown>{comment.metadata?.content || ''}</ReactMarkdown>
+                <ReactMarkdown>{content}</ReactMarkdown>
               </div>
               
               {hasReplies && (
