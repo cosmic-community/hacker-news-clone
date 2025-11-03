@@ -35,7 +35,9 @@ export default function CommentItem({ comment, depth, storyId, isLoggedIn, onCom
       id: newComment.id,
       title: newComment.title,
       slug: newComment.slug,
+      type: 'comments', // Changed: Added required type property
       created_at: newComment.created_at,
+      modified_at: newComment.modified_at || newComment.created_at, // Changed: Added required modified_at property
       metadata: {
         author: newComment.metadata?.author || 'unknown',
         content: newComment.metadata?.content || '',
