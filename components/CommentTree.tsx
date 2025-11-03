@@ -4,9 +4,11 @@ import CommentItem from '@/components/CommentItem'
 interface CommentTreeProps {
   comments: NestedComment[]
   depth?: number
+  storyId: string
+  isLoggedIn: boolean
 }
 
-export default function CommentTree({ comments, depth = 0 }: CommentTreeProps) {
+export default function CommentTree({ comments, depth = 0, storyId, isLoggedIn }: CommentTreeProps) {
   if (!comments || comments.length === 0) {
     return null
   }
@@ -18,6 +20,8 @@ export default function CommentTree({ comments, depth = 0 }: CommentTreeProps) {
           key={comment.id} 
           comment={comment}
           depth={depth}
+          storyId={storyId}
+          isLoggedIn={isLoggedIn}
         />
       ))}
     </div>

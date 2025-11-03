@@ -1,5 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
-import { User, Story } from '@/types'
+import { User, Story, Comment } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -148,6 +148,33 @@ export async function createStory(
   } catch (error) {
     console.error('Failed to create story:', error);
     throw new Error('Failed to create story');
+  }
+}
+
+// Create a new comment
+export async function createComment(
+  content: string,
+  author: string,
+  storyId: string,
+  parentCommentId?: string
+): Promise<Comment> {
+  try {
+    const response = await cosmic.objects.insertOne({
+      title: `Comment by ${author}`,
+      type: 'comments',
+      metadata: {
+        content,
+        author,
+        story: storyId,
+        parent_comment: parentCommentId || '',
+        points: 0
+      }
+    });
+    
+    return response.object as Comment;
+  } catch (error) {
+    console.error('Failed to create comment:', error);
+    throw new Error('Failed to create comment');
   }
 }
 
