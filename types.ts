@@ -43,6 +43,17 @@ export interface Comment extends CosmicObject {
   };
 }
 
+// User object with properly typed metadata
+export interface User extends CosmicObject {
+  type: 'users';
+  metadata: {
+    name: string;
+    email: string;
+    password_hash: string;
+    created_at: string;
+  };
+}
+
 // API response types
 export interface CosmicResponse<T> {
   objects: T[];
@@ -60,6 +71,10 @@ export function isComment(obj: CosmicObject): obj is Comment {
   return obj.type === 'comments';
 }
 
+export function isUser(obj: CosmicObject): obj is User {
+  return obj.type === 'users';
+}
+
 // Utility types
 export type StoryWithComments = Story & {
   comments?: Comment[];
@@ -68,3 +83,21 @@ export type StoryWithComments = Story & {
 export type NestedComment = Comment & {
   replies?: NestedComment[];
 };
+
+// Auth types
+export interface AuthSession {
+  userId: string;
+  email: string;
+  name: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface SignupCredentials {
+  name: string;
+  email: string;
+  password: string;
+}
