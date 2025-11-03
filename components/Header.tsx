@@ -26,6 +26,14 @@ export default async function Header() {
               <Link href="/?type=show" className="text-white hover:underline">
                 show
               </Link>
+              {session && (
+                <>
+                  <span className="text-white">|</span>
+                  <Link href="/submit" className="text-white hover:underline">
+                    submit
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
 

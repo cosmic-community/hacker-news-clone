@@ -1,5 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
-import { User } from '@/types'
+import { User, Story } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -90,6 +90,44 @@ export async function getStoryComments(storyId: string) {
       return [];
     }
     throw new Error('Failed to fetch comments');
+  }
+}
+
+// Create a new story
+export async function createStory(
+  title: string,
+  storyType: 'link' | 'text' | 'ask' | 'show',
+  author: string,
+  url?: string,
+  content?: string
+): Promise<Story> {
+  try {
+    // Map story type keys to values for the select-dropdown
+    const storyTypeMap = {
+      'link': 'Link',
+      'text': 'Text',
+      'ask': 'Ask HN',
+      'show': 'Show HN'
+    };
+
+    const response = await cosmic.objects.insertOne({
+      title,
+      type: 'stories',
+      metadata: {
+        title,
+        story_type: storyTypeMap[storyType],
+        author,
+        url: url || '',
+        content: content || '',
+        points: 0,
+        comment_count: 0
+      }
+    });
+    
+    return response.object as Story;
+  } catch (error) {
+    console.error('Failed to create story:', error);
+    throw new Error('Failed to create story');
   }
 }
 
