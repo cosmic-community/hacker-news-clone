@@ -66,23 +66,26 @@ export async function getStory(slug: string) {
   }
 }
 
-// Fetch comments for a story - improved to handle object relationships properly
+// Fetch comments for a story - query object relationships by ID only
 export async function getStoryComments(storyId: string) {
   try {
-    // Query by the story object ID in the metadata.story field
+    // For object relationship metafields, query by the field name directly with the object ID
+    // The query format should be 'metadata.story' with just the ID value
     const response = await cosmic.objects
       .find({ 
         type: 'comments',
         'metadata.story': storyId
       })
       .props(['id', 'title', 'slug', 'metadata', 'created_at'])
-      .depth(2);
+      .depth(2); // Depth 2 to get parent_comment relationships
     
     console.log('Fetched comments for story:', storyId, 'Count:', response.objects.length);
+    console.log('Sample comment metadata:', response.objects[0]?.metadata);
     return response.objects;
   } catch (error) {
     console.error('Error fetching comments:', error);
     if (hasStatus(error) && error.status === 404) {
+      console.log('No comments found (404) for story:', storyId);
       return [];
     }
     throw new Error('Failed to fetch comments');

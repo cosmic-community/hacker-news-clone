@@ -18,10 +18,16 @@ async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
   }
 
   // Fetch comments using the story ID
+  console.log('Fetching comments for story:', story.title);
+  console.log('Story ID:', story.id);
+  console.log('Story metadata:', JSON.stringify(story.metadata, null, 2));
+  
   const comments = await getStoryComments(story.id)
   
-  console.log('Story:', story.title, 'ID:', story.id);
   console.log('Comments fetched:', comments.length);
+  if (comments.length > 0) {
+    console.log('First comment:', JSON.stringify(comments[0], null, 2));
+  }
   
   const commentTree = buildCommentTree(comments as Comment[])
   
