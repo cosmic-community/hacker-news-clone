@@ -8,7 +8,7 @@ interface StoryDetailProps {
 
 export default function StoryDetail({ story }: StoryDetailProps) {
   const isExternalLink = story.metadata?.url
-  const domain = isExternalLink ? getDomain(story.metadata.url) : ''
+  const domain = isExternalLink ? getDomain(story.metadata.url || '') : ''
   const hasContent = story.metadata?.content
 
   return (
