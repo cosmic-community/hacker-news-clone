@@ -1,4 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
+import { User } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -83,5 +84,83 @@ export async function getStoryComments(storyId: string) {
       return [];
     }
     throw new Error('Failed to fetch comments');
+  }
+}
+
+// User authentication functions
+
+// Find user by email
+export async function getUserByEmail(email: string): Promise<User | null> {
+  try {
+    const response = await cosmic.objects
+      .find({ 
+        type: 'users',
+        'metadata.email': email
+      })
+      .props(['id', 'title', 'slug', 'metadata', 'created_at'])
+      .depth(0);
+    
+    if (response.objects && response.objects.length > 0) {
+      return response.objects[0] as User;
+    }
+    return null;
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return null;
+    }
+    throw new Error('Failed to fetch user');
+  }
+}
+
+// Find user by ID
+export async function getUserById(id: string): Promise<User | null> {
+  try {
+    const response = await cosmic.objects.findOne({
+      id
+    }).props(['id', 'title', 'slug', 'metadata', 'created_at']).depth(0);
+    
+    return response.object as User;
+  } catch (error) {
+    if (hasStatus(error) && error.status === 404) {
+      return null;
+    }
+    throw new Error('Failed to fetch user');
+  }
+}
+
+// Create a new user
+export async function createUser(name: string, email: string, passwordHash: string): Promise<User> {
+  try {
+    const response = await cosmic.objects.insertOne({
+      title: name,
+      type: 'users',
+      metadata: {
+        name,
+        email,
+        password_hash: passwordHash,
+        created_at: new Date().toISOString()
+      }
+    });
+    
+    return response.object as User;
+  } catch (error) {
+    throw new Error('Failed to create user');
+  }
+}
+
+// Update user profile
+export async function updateUser(id: string, name: string, email: string): Promise<User> {
+  try {
+    const response = await cosmic.objects.updateOne(id, {
+      title: name,
+      metadata: {
+        name,
+        email
+      }
+    });
+    
+    return response.object as User;
+  } catch (error) {
+    throw new Error('Failed to update user');
   }
 }
